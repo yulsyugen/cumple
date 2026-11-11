@@ -341,7 +341,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 </section>
 
 <section class="snake" id="snake" aria-labelledby="t-snake">
-  <h2 class="h2 snake-title" id="t-snake">Hasta que llegue el sábado, jugá con la viborita <span>stab</span>:</h2>
+  <h2 class="h2 snake-title" id="t-snake">Hasta que llegue el sábado, jugá con la viborita:</h2>
   <div class="device" id="device">
     <div class="lcd">
       <div class="hud"><span>PUNTOS <b id="score">000</b></span><span>RÉCORD <b id="best">000</b></span></div>
@@ -360,7 +360,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
       </div>
     </div>
   </div>
-  <p class="hint">Flechas o WASD. En el celu, deslizá sobre la pantalla o usá los botones. Las paredes se atraviesan.</p>
 </section>
 
 </main>
@@ -739,28 +738,19 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
   btn.addEventListener('click', function () { playing ? pause() : play(); });
   document.addEventListener('visibilitychange', function () { if (document.hidden && playing) pause(); });
 
-  // Dub minimal: chord stabs disparados sólo al comer, con delay feedback persistente.
-  // El stab se cuantiza a 1/8 nota del tempo de la base (soft quantize) para caer en cuadratura.
+  // Dub minimal: palito (claves) disparado sólo al comer, sin delay.
+  // El palito se cuantiza a 1/8 nota del tempo de la base (soft quantize) para caer en cuadratura.
   // Al morir, efecto de globo desinflándose.
   var snakeOn = false, snakePaused = false;
   var snakeRoot = 0, snakeScore = 0;
-  var dubIn, dubDelay, dubFb, dubFilter;
+  var dubIn;
 
   function buildVoice() {
-    // Bus de stabs con delay feedback (dub)
-    dubIn = ac.createGain(); dubIn.gain.value = 0.9;
-    dubDelay = ac.createDelay(2);
-    dubDelay.delayTime.value = 60 / 124 / 2 * 1.5; // corchea con puntillo, sincrónica al tempo
-    dubFb = ac.createGain(); dubFb.gain.value = 0.58;
-    dubFilter = ac.createBiquadFilter(); dubFilter.type = 'highpass';
-    dubFilter.frequency.value = 450;
-    dubIn.connect(dubDelay);
-    dubDelay.connect(dubFilter).connect(dubFb).connect(dubDelay);
+    dubIn = ac.createGain(); dubIn.gain.value = 0.9; // bus del palito, sin delay
     dubIn.connect(acidBus);
-    dubDelay.connect(acidBus);
   }
   function teardownVoice() {
-    dubIn = dubDelay = dubFb = dubFilter = null;
+    dubIn = null;
   }
   // Próximo 1/8 nota a 124 BPM, cuantizado contra el anchor de la música cuando existe.
   function nextBeatTime() {
@@ -770,23 +760,35 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     var elapsed = now - anchor;
     return anchor + Math.ceil(elapsed / sub) * sub;
   }
-  function stab(when) {
+  // Palito (claves): cuerpo senoidal con caída de pitch muy rápida + click de ruido. Afinado según snakeRoot.
+  function palito(when) {
     if (!dubIn) return;
     var t = when || ac.currentTime;
-    // Acorde m7 abierto: root, quinta, séptima menor (sin tercera, deja espacio)
-    [0, 7, 10].forEach(function (semi) {
-      var o = ac.createOscillator(); o.type = 'triangle';
-      o.frequency.value = mtof(snakeRoot + 24 + semi);
-      var flt = ac.createBiquadFilter(); flt.type = 'lowpass';
-      flt.frequency.value = 1400 + Math.min(snakeScore, 25) * 90;
-      flt.Q.value = 2.5;
+    var f = mtof(snakeRoot + 57); // ~1.5 kHz, sube/baja con el pitch de la serpiente
+    // cuerpo: dos parciales (fundamental + inarmónico) para el timbre de madera
+    [[1, 0.42, 0.10], [2.76, 0.12, 0.05]].forEach(function (p) {
+      var o = ac.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(f * p[0] * 1.12, t);
+      o.frequency.exponentialRampToValueAtTime(f * p[0], t + 0.012);
       var g = ac.createGain();
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.16, t + 0.006);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
-      o.connect(flt).connect(g).connect(dubIn);
-      o.start(t); o.stop(t + 0.37);
+      g.gain.exponentialRampToValueAtTime(p[1], t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.0008, t + p[2] + 0.02);
+      o.connect(g).connect(dubIn);
+      o.start(t); o.stop(t + p[2] + 0.06);
     });
+    // click de ataque (palo contra palo)
+    var n = Math.floor(ac.sampleRate * 0.02);
+    var buf = ac.createBuffer(1, n, ac.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    var src = ac.createBufferSource(); src.buffer = buf;
+    var bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 1.5;
+    var cg = ac.createGain();
+    cg.gain.setValueAtTime(0.28, t);
+    cg.gain.exponentialRampToValueAtTime(0.001, t + 0.018);
+    src.connect(bp).connect(cg).connect(dubIn);
+    src.start(t);
   }
 
   // Globito pinchándose: pop corto + squeal descendente con flutter + ruido de aire
@@ -861,7 +863,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     },
     stop: function (died) {
       snakeOn = false; snakePaused = false;
-      if (dubFb) dubFb.gain.setValueAtTime(0.25, ac.currentTime); // amortiguar feedback
       if (died) balloonPop();
       setTimeout(function () { teardownVoice(); if (!playing && !snakeOn) releaseMedia(); }, 2000); // tiempo para que decaigan los ecos
     },
@@ -870,7 +871,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
       if (snakeRoot >= 7) snakeRoot -= 5;
       else if (snakeRoot <= -5) snakeRoot += 7;
       else snakeRoot += (score % 2 === 0) ? 7 : -5;
-      stab(nextBeatTime());
+      palito(nextBeatTime());
     }
   };
 
