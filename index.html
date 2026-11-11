@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cumpleañitos en la City</title>
+<meta name="description" content="Mi cumple 27 en la Noche de los Museos 2026: recorrido, paradas y transporte gratis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=Space+Mono:wght@400;700&amp;family=Syne:wght@700;800&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout idea: una sola columna de celular sobre tinta oscura; portada, ruta en zigzag con nodos numerados, tarjetas de paradas y un Snake al final. */
+:root {
+  --ink: #0C0A10;
+  --card: #17111F;
+  --paper: #F1EFEA;
+  --muted: #B9B1C8;
+  --soft: #E6E1EF;
+  --lime: #B6FF00;
+  --lime-hi: #C2FA17;
+  --violet: #9F66FA;
+  --f-display: 'Syne', system-ui, sans-serif;
+  --f-body: 'Space Grotesk', system-ui, sans-serif;
+  --f-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --gutter: 20px;
+  --row: 128px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--ink); -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ink); color: var(--paper); font-family: var(--f-body); font-size: 16px; line-height: 1.45; }
+.col { max-width: 560px; margin: 0 auto; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p, ol, dl, dd { margin: 0; padding: 0; }
+ol { list-style: none; }
+img { display: block; max-width: 100%; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+.mono { font-family: var(--f-mono); }
+
+/* Botones */
+.btn { display: inline-flex; align-items: center; justify-content: center; text-align: center; min-height: 48px; padding: 10px 22px; border-radius: 999px; font-family: var(--f-mono); font-weight: 700; font-size: 14px; line-height: 1.25; border: 0; cursor: pointer; }
+.btn--lime { background: var(--lime); color: var(--ink); }
+.btn--paper { background: var(--paper); color: var(--ink); width: 100%; min-height: 56px; font-size: 15px; }
+.btn--ink { background: var(--ink); color: var(--lime); }
+
+/* Portada */
+.hero { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #000; }
+.hero img { width: 100%; height: 100%; object-fit: cover; }
+.hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28%; background: linear-gradient(to bottom, rgba(12,10,16,0), var(--ink)); }
+.pill { position: absolute; top: 16px; z-index: 1; padding: 8px 14px; border-radius: 999px; background: var(--violet); color: var(--ink); font-family: var(--f-mono); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; }
+.pill--l { left: var(--gutter); }
+.pill--r { right: var(--gutter); }
+.intro { position: relative; isolation: isolate; padding: 8px var(--gutter) 40px; }
+.intro::before, .map::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url("dots.jpg") center / cover; opacity: 0.14; }
+.kicker { font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.08em; color: var(--lime); }
+.title { margin-top: 10px; font-family: var(--f-display); font-weight: 800; font-size: clamp(27px, 7.6vw, 40px); line-height: 0.95; letter-spacing: -0.02em; text-transform: uppercase; color: var(--lime-hi); text-wrap: balance; }
+.facts { margin-top: 22px; padding-top: 18px; border-top: 2px solid rgba(241, 239, 234, 0.2); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.fact-k { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
+.fact-n { margin-top: 4px; font-family: var(--f-display); font-weight: 700; font-size: clamp(19px, 5.4vw, 24px); line-height: 1.1; }
+.fact-s { margin-top: 4px; font-size: 15px; color: #D9D3E6; }
+.msg { margin-top: 22px; padding: 20px 22px; border-radius: 18px; background: rgba(12, 10, 16, 0.94); border: 1px solid rgba(241, 239, 234, 0.14); display: flex; flex-direction: column; gap: 14px; font-size: 18px; line-height: 1.4; font-weight: 500; }
+.sign { margin-top: 24px; text-align: right; font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.12em; color: var(--lime); }
+
+/* Mapa / recorrido */
+.map { position: relative; isolation: isolate; padding: 40px var(--gutter) 0; }
+.h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(34px, 10vw, 52px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; }
+.h2 span { color: var(--lime); }
+.sub { margin-top: 10px; font-size: 17px; color: #D9D3E6; }
+.route { position: relative; margin-top: 28px; }
+.route-list { display: grid; grid-auto-rows: var(--row); }
+.route-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 6px var(--lime)); }
+.route-line path { fill: none; stroke: var(--lime); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.route-line .dash { stroke-dasharray: 9 9; }
+.stop { position: relative; }
+.node { --s: 52px; position: absolute; z-index: 2; top: calc(52px - var(--s) / 2); left: calc(var(--x) - var(--s) / 2); width: var(--s); height: var(--s); display: grid; place-items: center; border-radius: 50%; background: var(--lime); color: var(--ink); font-family: var(--f-display); font-weight: 800; font-size: 22px; box-shadow: 0 0 24px var(--lime); }
+.node--big { --s: 66px; font-size: 28px; border: 5px solid var(--ink); box-shadow: 0 0 0 3px var(--lime), 0 0 32px var(--lime); }
+.node--open { background: var(--ink); color: var(--lime); border: 3px dashed var(--lime); box-shadow: 0 0 16px rgba(182, 255, 0, 0.5); }
+.label { position: absolute; z-index: 1; top: 14px; padding: 10px 14px; border-radius: 14px; background: rgba(12, 10, 16, 0.94); border: 1px solid rgba(241, 239, 234, 0.12); }
+.stop--l .label { left: calc(var(--x) + 40px); right: 0; }
+.stop--r .label { right: calc(100% - var(--x) + 40px); left: 0; }
+.stop--open .label { border: 2px dashed rgba(182, 255, 0, 0.45); }
+.l-time { display: block; font-family: var(--f-mono); font-weight: 700; font-size: 13px; color: var(--lime); }
+.l-name { display: block; font-family: var(--f-display); font-weight: 700; font-size: clamp(16px, 4.9vw, 22px); line-height: 1.1; }
+.l-sub { display: block; margin-top: 3px; font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.map-actions { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+.transport { padding: 20px 22px; border-radius: 18px; background: rgba(12, 10, 16, 0.94); border: 1px solid rgba(241, 239, 234, 0.14); }
+.transport h3 { font-family: var(--f-mono); font-weight: 400; font-size: 13px; letter-spacing: 0.12em; color: var(--lime); }
+.transport dl { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; color: var(--soft); font-size: 16px; line-height: 1.45; }
+.transport dt { display: inline; font-weight: 700; color: var(--paper); }
+.transport dd { display: inline; }
+.transport-note { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(241, 239, 234, 0.12); font-size: 15px; line-height: 1.4; color: var(--soft); }
+.transport-btn { margin-top: 12px; width: 100%; }
+/* Música flotante */
+.music { position: fixed; z-index: 10; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border-radius: 999px; background: rgba(23, 17, 31, 0.92); border: 1px solid rgba(241, 239, 234, 0.18); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--paper); font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+.music:hover { background: rgba(31, 24, 42, 0.95); }
+.music-ico { position: relative; width: 28px; height: 28px; border-radius: 50%; background: var(--lime); color: var(--ink); display: grid; place-items: center; }
+.music-ico svg { width: 12px; height: 12px; fill: currentColor; }
+.music[data-on="true"] .music-ico { animation: pulse 1.5s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(182, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0); } }
+.music-on .ico-play { display: none; }
+.music-off .ico-pause { display: none; }
+
+/* Paradas */
+.stops { padding: 8px var(--gutter) 0; }
+.stops .h2 { margin-top: 8px; }
+.cards { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+.card { display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 16px; padding: 22px 20px; border-radius: 24px; background: var(--card); border: 1px solid rgba(241, 239, 234, 0.14); }
+.num { font-family: var(--f-display); font-weight: 800; font-size: 64px; line-height: 0.85; text-align: center; color: var(--lime); }
+.time { margin-top: 8px; font-family: var(--f-mono); font-weight: 700; font-size: 15px; text-align: center; color: var(--paper); }
+.card-k { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+.card h3 { margin-top: 6px; font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 6.4vw, 30px); line-height: 1.08; text-wrap: balance; }
+.addr { margin-top: 6px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.card p { margin-top: 10px; font-size: 16px; line-height: 1.45; color: var(--soft); }
+.card .btn { margin-top: 16px; }
+.next { margin-top: 16px; padding: 12px 14px; border-radius: 12px; border: 1px dashed rgba(182, 255, 0, 0.35); font-family: var(--f-mono); font-size: 13px; line-height: 1.4; color: var(--soft); letter-spacing: 0.02em; }
+.next b { color: var(--lime); font-weight: 700; }
+.card--accent .next { border-color: rgba(12, 10, 16, 0.5); color: #26240F; }
+.card--accent .next b { color: var(--ink); }
+.card--accent { background: var(--lime); border-color: var(--lime); }
+.card--accent .num, .card--accent .time, .card--accent h3, .card--accent p { color: var(--ink); }
+.card--accent .card-k, .card--accent .addr { color: #26240F; }
+.card--open { border: 2px dashed rgba(182, 255, 0, 0.5); }
+
+/* Snake */
+.snake { padding: 48px var(--gutter) 56px; }
+.snake .h2 { font-size: clamp(30px, 8.5vw, 42px); }
+.snake-title { font-size: clamp(22px, 6vw, 30px); line-height: 1.1; text-transform: none; text-wrap: balance; }
+.device { margin-top: 20px; padding: 18px 16px 20px; border-radius: 30px; background: linear-gradient(160deg, #2a1d3d, #1a1226); border: 1px solid rgba(241, 239, 234, 0.14); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); }
+.lcd { padding: 10px; border-radius: 12px; background: #b5c99a; color: #1c2618; box-shadow: inset 0 0 0 3px #2b3626; }
+.hud { display: flex; justify-content: space-between; gap: 8px; padding: 2px 4px 8px; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; }
+.hud b { font-weight: 700; }
+.screen { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; border: 2px solid #1c2618; }
+.screen canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 14; image-rendering: pixelated; }
+.overlay { position: absolute; inset: 0; display: grid; place-content: center; gap: 6px; padding: 12px; text-align: center; background: rgba(181, 201, 154, 0.86); }
+.overlay[hidden] { display: none; }
+.overlay strong { font-family: var(--f-display); font-weight: 800; font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
+.overlay span { font-family: var(--f-mono); font-size: 13px; }
+.controls { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.pad { display: grid; grid-template-columns: repeat(3, 52px); grid-template-areas: ". up ." "left down right"; gap: 6px; }
+.pad button { width: 52px; height: 52px; border-radius: 14px; border: 1px solid rgba(241, 239, 234, 0.2); background: #2f2342; color: var(--paper); font-size: 18px; cursor: pointer; touch-action: manipulation; }
+.pad button:active { background: #45345f; }
+.pad [data-dir="up"] { grid-area: up; }
+.pad [data-dir="left"] { grid-area: left; }
+.pad [data-dir="down"] { grid-area: down; }
+.pad [data-dir="right"] { grid-area: right; }
+.hint { margin-top: 14px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<button class="music music-off" id="music" type="button" data-on="false" aria-pressed="false" aria-label="Reproducir música de fondo">
+  <span class="music-ico">
+    <svg class="ico-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2v8l7-4z"/></svg>
+    <svg class="ico-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2h2.4v8H3zM6.6 2H9v8H6.6z"/></svg>
+  </span>
+  <span id="music-label">Play</span>
+</button>
+
+<main class="col">
+
+<header>
+  <div class="hero">
+    <img src="cover.jpg" alt="" width="1080" height="1350">
+    <span class="pill pill--l">MIS 27s</span>
+    <span class="pill pill--r">14.11.2026</span>
+  </div>
+  <div class="intro">
+    <p class="kicker">SÁB 14 NOV · 20 H</p>
+    <h1 class="title">Cumpleañitos en la city, auspicia la noche de los museos 2026</h1>
+    <div class="facts">
+      <div>
+        <p class="fact-k">ENCUENTRO</p>
+        <p class="fact-n">Estación Dorrego</p>
+        <p class="fact-s">Subte B · 20:00 h</p>
+      </div>
+      <div>
+        <p class="fact-k">CENA</p>
+        <p class="fact-n">Pizzería Pirilo</p>
+        <p class="fact-s">San Telmo · 22 h</p>
+      </div>
+    </div>
+    <div class="msg">
+      <p>Hola bb. Este domingo (15/11) llegan mis 27 añitos y me encantaría que me acompañes a recibirlos en un tour artístico por nuestra hermosa ciudad. Aprovechando que estamos en el marco de la noche de los museos, la idea es ir a experimentar distintas propuestas audiovisuales seleccionadas. ¿Lo mejorrrr? todos los accesos y el transporte son gratis, anti-crisis fascista.</p>
+      <p>La idea es encontrarnos a las 20 h y salir juntxs, pero si se te hace tarde (ya te conozco) te podés sumar en cualquier parte del recorrido!! Más abajo todo el detashhhh</p>
+    </div>
+    <p class="sign">TE INVITA YULS :)</p>
+  </div>
+</header>
+
+<section class="map" id="mapa" aria-labelledby="t-mapa">
+  <h2 class="h2" id="t-mapa">El <br><span>Recorrido</span></h2>
+  <p class="sub">+ Horarios de referencia</p>
+
+  <div class="route">
+    <!-- Una sola línea detrás de los nodos. Cada nodo está a mitad de su fila (52px). -->
+    <svg class="route-line" viewBox="0 0 100 896" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M14 52 L84 180 L20 308 L80 436 L16 564 L76 692"/>
+      <path class="dash" d="M76 692 L22 820"/>
+    </svg>
+  <ol class="route-list">
+    <li class="stop stop--l" style="--x:14%">
+      <span class="node">1</span>
+      <div class="label"><span class="l-time">20:00</span><span class="l-name">Estación Dorrego</span><span class="l-sub">Encuentro · Subte B</span></div>
+    </li>
+    <li class="stop stop--r" style="--x:84%">
+      <span class="node">2</span>
+      <div class="label"><span class="l-time">20:45</span><span class="l-name">CC Recoleta</span><span class="l-sub">Recoleta</span></div>
+    </li>
+    <li class="stop stop--l" style="--x:20%">
+      <span class="node">3</span>
+      <div class="label"><span class="l-time">22:00</span><span class="l-name">Pirilo Pizzería</span><span class="l-sub">San Telmo</span></div>
+    </li>
+    <li class="stop stop--r" style="--x:80%">
+      <span class="node">4</span>
+      <div class="label"><span class="l-time">23:00</span><span class="l-name">Estudio CAT</span><span class="l-sub">San Telmo</span></div>
+    </li>
+    <li class="stop stop--l" style="--x:16%">
+      <span class="node">5</span>
+      <div class="label"><span class="l-time">00:00</span><span class="l-name">Templo Escondido</span><span class="l-sub">Barracas</span></div>
+    </li>
+    <li class="stop stop--r" style="--x:76%">
+      <span class="node node--big">6</span>
+      <div class="label"><span class="l-time">01:00</span><span class="l-name">Usina del Arte</span><span class="l-sub">La Boca</span></div>
+    </li>
+    <li class="stop stop--l stop--open" style="--x:22%">
+      <span class="node node--open">7</span>
+      <div class="label"><span class="l-time">02:30</span><span class="l-name">?????</span><span class="l-sub">To be continued?</span></div>
+    </li>
+  </ol>
+  </div>
+
+  <div class="map-actions">
+    <a class="btn btn--paper" href="https://www.google.com/maps/dir/?api=1&amp;origin=Estaci%C3%B3n+Dorrego+Subte+B+Buenos+Aires&amp;destination=Usina+del+Arte+Caffarena+1+Buenos+Aires&amp;waypoints=Centro+Cultural+Recoleta+Jun%C3%ADn+1930+Buenos+Aires%7CPirilo+Pizzer%C3%ADa+Defensa+821+Buenos+Aires%7CEstudio+CAT+Chacabuco+974+San+Telmo+Buenos+Aires%7CMuseo+Santa+Felicitas+Pinz%C3%B3n+1480+Buenos+Aires" target="_blank" rel="noopener">Ver el recorrido completo en Google Maps ↗</a>
+    <div class="transport">
+      <h3>🚌 TRANSPORTE GRATUITO</h3>
+      <dl>
+        <div><dt>Pase Libre:</dt> <dd>colectivos gratis de 18 a 3 h.</dd></div>
+        <div><dt>Subte B y D:</dt> <dd>servicio extendido hasta las 2 h.</dd></div>
+        <div><dt>EBUS:</dt> <dd>cada 15 min, 19 a 3 h, cabecera Usina.</dd></div>
+        <div><dt>Ecobici:</dt> <dd>4 viajes de 45 min gratis.</dd></div>
+      </dl>
+      <p class="transport-note">No te olvides de descargar el Pase Libre para poder viajar.</p>
+      <a class="btn btn--lime transport-btn" href="https://festivalesba.org/la-noche-de-los-museos/" target="_blank" rel="noopener">Descargar Pase Libre ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="stops" id="paradas" aria-labelledby="t-paradas">
+  <h2 class="h2" id="t-paradas">Las <br><span>Paradas</span></h2>
+  <div class="cards">
+
+    <article class="card">
+      <div><p class="num">1</p><p class="time">20:00</p></div>
+      <div>
+        <p class="card-k">Encuentro</p>
+        <h3>Estación Dorrego</h3>
+        <p class="addr">Subte B</p>
+        <p>Nos juntamos acá y a las 20.20 como mucho arrancamos. Podes traer buena compañía :)</p>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Estaci%C3%B3n+Dorrego+Subte+B+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Hacia CC Recoleta:</b> Subte B hasta Corrientes + combinación con H hasta Las Heras + 10 min a pie por Av. Pueyrredón.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div><p class="num">2</p><p class="time">21:00</p></div>
+      <div>
+        <p class="card-k">Recoleta</p>
+        <h3>Centro Cultural Recoleta</h3>
+        <p class="addr">Junín 1930</p>
+        <p>DJ Set de HTML (Marina Saporiti) en el Patio del Aljibe, de 20 a 22 h: un recorrido sonoro entre lo analógico y lo digital, minimalista y experimental.<br>A las 21:30 arranca Meridiana en la terraza, hace rock alternativo con guitarras procesadas.</p>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Centro+Cultural+Recoleta+Jun%C3%ADn+1930+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Hacia Pirilo:</b> Subte D desde Facultad de Medicina hasta Catedral + 10 min a pie por Defensa.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div><p class="num">3</p><p class="time">22:00</p></div>
+      <div>
+        <p class="card-k">San Telmo</p>
+        <h3>Pirilo Pizzería</h3>
+        <p class="addr">Defensa 821</p>
+        <p>Paradita gastronómica. Pizza clásica porteña para comer de parado y recargar energy.</p>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Pirilo+Pizzer%C3%ADa+Defensa+821+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Hacia Estudio CAT:</b> a pie, 7 min por Defensa — los dos en San Telmo.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div><p class="num">4</p><p class="time">23:00</p></div>
+      <div>
+        <p class="card-k">San Telmo</p>
+        <h3>Estudio CAT</h3>
+        <p class="addr">Ciencia, Arte y Tecnología · Chacabuco 974</p>
+        <p>Lilí Gardés Project: set performático con visuales y canciones electrónicas, entre lo ancestral y lo futuro. Además, instalaciones inmersivas de Mariano Airaldi, luminarias de diseño y música experimental en vivo.</p>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Estudio+CAT+Chacabuco+974+San+Telmo+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Hacia Templo Escondido:</b> colectivo 29 hacia Barracas por Montes de Oca (~10 min).</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div><p class="num">5</p><p class="time">00:00</p></div>
+      <div>
+        <p class="card-k">Barracas</p>
+        <h3>Templo Escondido</h3>
+        <p class="addr">Complejo Santa Felicitas · Pinzón 1480</p>
+        <p>Música pintada: performance audiovisual de Philharmonic Pictures. Luz y mapping de pinturas de ebru sobre la arquitectura del templo, inspirada en Las Cuatro Estaciones de Vivaldi.</p>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Museo+Santa+Felicitas+Pinz%C3%B3n+1480+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Hacia la Usina:</b> caminando 12 min, ya estamos en zona.</p>
+      </div>
+    </article>
+
+    <article class="card card--accent">
+      <div><p class="num">6</p><p class="time">01:00</p></div>
+      <div>
+        <p class="card-k">La Boca</p>
+        <h3>Usina del Arte</h3>
+        <p class="addr">Caffarena 1</p>
+        <p>Cuerpo/Señal: proyecciones láser, sonido y luz sobre la fachada, reactivo a las siluetas en tiempo real.<br>DJ sets en la plaza hasta las 2 h (Balaciano, Chinwezz, Carlos Alfonsin, Chiri, Gonz Lijtenberg).</p>
+        <a class="btn btn--ink" href="https://www.google.com/maps/search/?api=1&amp;query=Usina+del+Arte+Caffarena+1+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Para salir de la Usina:</b> EBUS gratis hasta las 03 h.</p>
+      </div>
+    </article>
+
+    <article class="card card--open">
+      <div><p class="num">7</p><p class="time">02:30</p></div>
+      <div>
+        <p class="card-k">Se sigue o a mimir?</p>
+        <h3>????????</h3>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section class="snake" id="snake" aria-labelledby="t-snake">
+  <h2 class="h2 snake-title" id="t-snake">Hasta que llegue el sábado, jugá con la viborita <span>stab</span>:</h2>
+  <div class="device" id="device">
+    <div class="lcd">
+      <div class="hud"><span>PUNTOS <b id="score">000</b></span><span>RÉCORD <b id="best">000</b></span></div>
+      <div class="screen" id="screen">
+        <canvas id="cv" width="320" height="280" role="img" aria-label="Pantalla del juego Snake"></canvas>
+        <div class="overlay" id="overlay" role="status" aria-live="polite"><strong id="ov-title">Snake</strong><span id="ov-sub">Tocá Jugar</span></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn--lime" id="play" type="button">Jugar</button>
+      <div class="pad">
+        <button type="button" data-dir="up" aria-label="Arriba">▲</button>
+        <button type="button" data-dir="left" aria-label="Izquierda">◀</button>
+        <button type="button" data-dir="down" aria-label="Abajo">▼</button>
+        <button type="button" data-dir="right" aria-label="Derecha">▶</button>
+      </div>
+    </div>
+  </div>
+  <p class="hint">Flechas o WASD. En el celu, deslizá sobre la pantalla o usá los botones. Las paredes se atraviesan.</p>
+</section>
+
+</main>
+
+<script>
+(function () {
+  var COLS = 16, ROWS = 14, CELL = 20;
+  var BG = '#b5c99a', FG = '#1c2618';
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var scoreEl = document.getElementById('score');
+  var bestEl = document.getElementById('best');
+  var overlay = document.getElementById('overlay');
+  var ovTitle = document.getElementById('ov-title');
+  var ovSub = document.getElementById('ov-sub');
+  var playBtn = document.getElementById('play');
+  var screen = document.getElementById('screen');
+  var device = document.getElementById('device');
+
+  var snake, dir, queue, food, score = 0, best = 0;
+  var state = 'idle'; // idle | running | paused | over | won
+  var timer = null;
+
+  try { best = parseInt(localStorage.getItem('snake-best') || '0', 10) || 0; } catch (e) { best = 0; }
+
+  function pad3(n) { return ('000' + n).slice(-3); }
+  function updateScore() { scoreEl.textContent = pad3(score); bestEl.textContent = pad3(best); }
+
+  function spawn() {
+    var occ = {}, free = [], i, x, y;
+    for (i = 0; i < snake.length; i++) occ[snake[i].x + ',' + snake[i].y] = true;
+    for (y = 0; y < ROWS; y++) for (x = 0; x < COLS; x++) if (!occ[x + ',' + y]) free.push({ x: x, y: y });
+    return free.length ? free[Math.floor(Math.random() * free.length)] : null;
+  }
+
+  function reset() {
+    var cy = Math.floor(ROWS / 2);
+    snake = [{ x: 5, y: cy }, { x: 4, y: cy }, { x: 3, y: cy }];
+    dir = { x: 1, y: 0 };
+    queue = [];
+    score = 0;
+    food = spawn();
+    updateScore();
+  }
+
+  function block(gx, gy) {
+    var px = gx * CELL, py = gy * CELL;
+    ctx.fillStyle = FG;
+    ctx.fillRect(px + 1, py + 1, CELL - 2, CELL - 2);
+    ctx.fillStyle = BG;
+    ctx.fillRect(px + 9, py + 3, 2, CELL - 6);
+    ctx.fillRect(px + 3, py + 9, CELL - 6, 2);
+  }
+
+  function pickup(gx, gy) {
+    var px = gx * CELL, py = gy * CELL;
+    ctx.fillStyle = FG;
+    ctx.fillRect(px + 7, py + 2, 6, 6);
+    ctx.fillRect(px + 7, py + 12, 6, 6);
+    ctx.fillRect(px + 2, py + 7, 6, 6);
+    ctx.fillRect(px + 12, py + 7, 6, 6);
+  }
+
+  function draw() {
+    var i;
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    for (i = 0; i < snake.length; i++) block(snake[i].x, snake[i].y);
+    if (food) pickup(food.x, food.y);
+  }
+
+  function showOverlay(title, sub) {
+    ovTitle.textContent = title;
+    ovSub.textContent = sub;
+    overlay.hidden = false;
+  }
+
+  function setDir(nx, ny) {
+    if (state !== 'running') return;
+    var last = queue.length ? queue[queue.length - 1] : dir;
+    if (nx === -last.x && ny === -last.y) return;
+    if (nx === last.x && ny === last.y) return;
+    if (queue.length < 2) queue.push({ x: nx, y: ny });
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    // arranca en 170ms, acelera 7ms por punto, piso en 55ms (vuelo rasante)
+    timer = setTimeout(step, Math.max(55, 170 - score * 7));
+  }
+
+  function end(won) {
+    clearTimeout(timer);
+    if (window.__snake) window.__snake.stop(!won); // globito solo al perder
+    state = won ? 'won' : 'over';
+    var record = score > best;
+    if (record) {
+      best = score;
+      try { localStorage.setItem('snake-best', String(best)); } catch (e) {}
+    }
+    updateScore();
+    draw();
+    showOverlay(won ? '¡Ganaste!' : 'Game over', score + (score === 1 ? ' punto' : ' puntos') + (record ? ' · ¡nuevo récord!' : ''));
+    playBtn.textContent = 'Otra vez';
+  }
+
+  function step() {
+    if (queue.length) dir = queue.shift();
+    var head = { x: (snake[0].x + dir.x + COLS) % COLS, y: (snake[0].y + dir.y + ROWS) % ROWS };
+    var eating = !!food && head.x === food.x && head.y === food.y;
+    var body = eating ? snake : snake.slice(0, -1);
+    for (var i = 0; i < body.length; i++) {
+      if (body[i].x === head.x && body[i].y === head.y) { end(false); return; }
+    }
+    snake.unshift(head);
+    if (eating) {
+      score++;
+      food = spawn();
+      updateScore();
+      if (window.__snake) window.__snake.bump(score);
+      if (!food) { draw(); end(true); return; }
+    } else {
+      snake.pop();
+    }
+    draw();
+    schedule();
+  }
+
+  function start() {
+    if (state === 'paused') {
+      state = 'running';
+    } else {
+      reset();
+      state = 'running';
+    }
+    overlay.hidden = true;
+    playBtn.textContent = 'Jugar';
+    draw();
+    schedule();
+    if (window.__snake) window.__snake.start();
+  }
+
+  function pause() {
+    if (state !== 'running') return;
+    clearTimeout(timer);
+    state = 'paused';
+    showOverlay('Pausa', 'Tocá Seguir');
+    playBtn.textContent = 'Seguir';
+    if (window.__snake) window.__snake.pause();
+  }
+
+  playBtn.addEventListener('click', start);
+
+  var KEYS = {
+    ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+    w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0], W: [0, -1], S: [0, 1], A: [-1, 0], D: [1, 0]
+  };
+  window.addEventListener('keydown', function (e) {
+    var k = KEYS[e.key];
+    if (!k || state !== 'running') return;
+    e.preventDefault();
+    setDir(k[0], k[1]);
+  });
+
+  var DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  Array.prototype.forEach.call(document.querySelectorAll('.pad button'), function (b) {
+    b.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      var d = DIRS[b.getAttribute('data-dir')];
+      setDir(d[0], d[1]);
+    });
+  });
+
+  var sx = 0, sy = 0, swiping = false;
+  screen.addEventListener('pointerdown', function (e) { swiping = true; sx = e.clientX; sy = e.clientY; });
+  screen.addEventListener('pointermove', function (e) {
+    if (!swiping) return;
+    var dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 1 : -1, 0); else setDir(0, dy > 0 ? 1 : -1);
+    sx = e.clientX; sy = e.clientY;
+  });
+  function endSwipe() { swiping = false; }
+  screen.addEventListener('pointerup', endSwipe);
+  screen.addEventListener('pointercancel', endSwipe);
+  screen.addEventListener('pointerleave', endSwipe);
+
+  document.addEventListener('visibilitychange', function () { if (document.hidden) pause(); });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) pause();
+    }, { threshold: 0.2 }).observe(device);
+  }
+
+  reset();
+  draw();
+  updateScore();
+})();
+
+/* Audio: tech minimal loop + acid synth para el snake */
+(function () {
+  var AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  var ac = null, master = null, musicBus = null, acidBus = null;
+  var playing = false, stepIdx = 0, nextTime = 0, timer = null;
+  var BPM = 124, STEP = 60 / BPM / 4; // 16th note
+  var btn = document.getElementById('music');
+  var label = document.getElementById('music-label');
+
+  function ensure() {
+    if (ac) return;
+    ac = new AC();
+    master = ac.createGain(); master.gain.value = 0.8; master.connect(ac.destination);
+    musicBus = ac.createGain(); musicBus.gain.value = 0.55; musicBus.connect(master);
+    acidBus = ac.createGain(); acidBus.gain.value = 0.7; acidBus.connect(master);
+  }
+  function resume() { if (ac && ac.state === 'suspended') ac.resume(); }
+
+  function noiseBuf(dur) {
+    var n = Math.floor(ac.sampleRate * dur);
+    var b = ac.createBuffer(1, n, ac.sampleRate);
+    var d = b.getChannelData(0);
+    for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    return b;
+  }
+
+  function kick(t) {
+    var o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.setValueAtTime(160, t);
+    o.frequency.exponentialRampToValueAtTime(42, t + 0.14);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(1.0, t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+    o.connect(g).connect(musicBus);
+    o.start(t); o.stop(t + 0.35);
+    // clicky top
+    var o2 = ac.createOscillator(), g2 = ac.createGain();
+    o2.type = 'triangle'; o2.frequency.value = 1200;
+    g2.gain.setValueAtTime(0.25, t);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+    o2.connect(g2).connect(musicBus);
+    o2.start(t); o2.stop(t + 0.02);
+  }
+  function hat(t, open) {
+    var src = ac.createBufferSource();
+    src.buffer = noiseBuf(open ? 0.18 : 0.05);
+    var hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+    var g = ac.createGain();
+    g.gain.setValueAtTime(open ? 0.18 : 0.12, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + (open ? 0.18 : 0.04));
+    src.connect(hp).connect(g).connect(musicBus);
+    src.start(t);
+  }
+  function clap(t) {
+    for (var k = 0; k < 3; k++) {
+      var src = ac.createBufferSource();
+      src.buffer = noiseBuf(0.03);
+      var bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1500; bp.Q.value = 0.6;
+      var g = ac.createGain();
+      var tt = t + k * 0.012;
+      g.gain.setValueAtTime(0.25, tt);
+      g.gain.exponentialRampToValueAtTime(0.001, tt + 0.06);
+      src.connect(bp).connect(g).connect(musicBus);
+      src.start(tt);
+    }
+  }
+  function bass(t, f) {
+    var o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f;
+    var lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 320; lp.Q.value = 3;
+    var g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    o.connect(lp).connect(g).connect(musicBus);
+    o.start(t); o.stop(t + 0.25);
+  }
+  function stab(t, f) {
+    var o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f;
+    var lp = ac.createBiquadFilter(); lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(2200, t);
+    lp.frequency.exponentialRampToValueAtTime(800, t + 0.15);
+    lp.Q.value = 6;
+    var g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+    o.connect(lp).connect(g).connect(musicBus);
+    o.start(t); o.stop(t + 0.2);
+  }
+
+  // Pattern: 16 steps per bar, 4 bars (64 steps)
+  // Root A (A1 = 55 Hz)
+  var ROOT = 55;
+  var SCALE = [0, 3, 5, 7, 10, 12]; // minor pentatonic + octave
+  function mtof(semi) { return ROOT * Math.pow(2, semi / 12); }
+  var BASS_PATTERN = [0, -1, -1, 0, -1, -1, 0, -1, 12, -1, -1, 3, -1, -1, 5, -1];
+  function scheduleStep(s, t) {
+    var bar = Math.floor(s / 16) % 4;
+    var i = s % 16;
+    if (i % 4 === 0) kick(t);
+    if (i % 4 === 2) hat(t, i === 14 && bar === 3);
+    if (i === 4 || i === 12) clap(t + 0.004);
+    var n = BASS_PATTERN[i];
+    if (n !== -1) bass(t, mtof(n));
+    // sparse stab chord on bar 2 & 4, step 8
+    if ((bar === 1 || bar === 3) && i === 8) {
+      stab(t, mtof(12));
+      stab(t + 0.005, mtof(15));
+    }
+  }
+  function tick() {
+    while (nextTime < ac.currentTime + 0.1) {
+      scheduleStep(stepIdx, nextTime);
+      nextTime += STEP;
+      stepIdx++;
+    }
+  }
+  function play() {
+    ensure(); resume();
+    if (playing) return;
+    playing = true;
+    stepIdx = 0; nextTime = ac.currentTime + 0.06;
+    window.__musicAnchor = nextTime; // para que el snake pueda cuantizar al beat
+    timer = setInterval(tick, 25);
+    btn.classList.remove('music-off'); btn.classList.add('music-on');
+    btn.setAttribute('data-on', 'true'); btn.setAttribute('aria-pressed', 'true');
+    btn.setAttribute('aria-label', 'Pausar música de fondo');
+    label.textContent = 'Pausa';
+  }
+  function pause() {
+    if (!playing) return;
+    playing = false;
+    clearInterval(timer); timer = null;
+    btn.classList.remove('music-on'); btn.classList.add('music-off');
+    btn.setAttribute('data-on', 'false'); btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', 'Reproducir música de fondo');
+    label.textContent = 'Play';
+  }
+  btn.addEventListener('click', function () { playing ? pause() : play(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && playing) pause(); });
+
+  // Dub minimal: chord stabs disparados sólo al comer, con delay feedback persistente.
+  // El stab se cuantiza a 1/8 nota del tempo de la base (soft quantize) para caer en cuadratura.
+  // Al morir, efecto de globo desinflándose.
+  var snakeOn = false, snakePaused = false;
+  var snakeRoot = 0, snakeScore = 0;
+  var dubIn, dubDelay, dubFb, dubFilter;
+
+  function buildVoice() {
+    // Bus de stabs con delay feedback (dub)
+    dubIn = ac.createGain(); dubIn.gain.value = 0.9;
+    dubDelay = ac.createDelay(2);
+    dubDelay.delayTime.value = 60 / 124 / 2 * 1.5; // corchea con puntillo, sincrónica al tempo
+    dubFb = ac.createGain(); dubFb.gain.value = 0.58;
+    dubFilter = ac.createBiquadFilter(); dubFilter.type = 'highpass';
+    dubFilter.frequency.value = 450;
+    dubIn.connect(dubDelay);
+    dubDelay.connect(dubFilter).connect(dubFb).connect(dubDelay);
+    dubIn.connect(acidBus);
+    dubDelay.connect(acidBus);
+  }
+  function teardownVoice() {
+    dubIn = dubDelay = dubFb = dubFilter = null;
+  }
+  // Próximo 1/8 nota a 124 BPM, cuantizado contra el anchor de la música cuando existe.
+  function nextBeatTime() {
+    var sub = 60 / 124 / 2; // 1/8 nota ≈ 0.242 s
+    var anchor = window.__musicAnchor || 0;
+    var now = ac.currentTime + 0.012; // pequeño look-ahead
+    var elapsed = now - anchor;
+    return anchor + Math.ceil(elapsed / sub) * sub;
+  }
+  function stab(when) {
+    if (!dubIn) return;
+    var t = when || ac.currentTime;
+    // Acorde m7 abierto: root, quinta, séptima menor (sin tercera, deja espacio)
+    [0, 7, 10].forEach(function (semi) {
+      var o = ac.createOscillator(); o.type = 'triangle';
+      o.frequency.value = mtof(snakeRoot + 24 + semi);
+      var flt = ac.createBiquadFilter(); flt.type = 'lowpass';
+      flt.frequency.value = 1400 + Math.min(snakeScore, 25) * 90;
+      flt.Q.value = 2.5;
+      var g = ac.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.16, t + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+      o.connect(flt).connect(g).connect(dubIn);
+      o.start(t); o.stop(t + 0.37);
+    });
+  }
+
+  // Globito pinchándose: pop corto + squeal descendente con flutter + ruido de aire
+  function balloonPop() {
+    ensure(); resume();
+    var now = ac.currentTime;
+    // 1) Pop inicial (noise burst corto, bandpass)
+    var popN = Math.floor(ac.sampleRate * 0.04);
+    var popBuf = ac.createBuffer(1, popN, ac.sampleRate);
+    var pd = popBuf.getChannelData(0);
+    for (var i = 0; i < popN; i++) pd[i] = (Math.random() * 2 - 1) * (1 - i / popN);
+    var pop = ac.createBufferSource(); pop.buffer = popBuf;
+    var popBp = ac.createBiquadFilter(); popBp.type = 'bandpass';
+    popBp.frequency.value = 1800; popBp.Q.value = 1.2;
+    var popG = ac.createGain();
+    popG.gain.setValueAtTime(0.55, now);
+    popG.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    pop.connect(popBp).connect(popG).connect(master);
+    pop.start(now);
+
+    // 2) Squeal descendente (globo desinflándose). Oscilador sawtooth que cae con flutter.
+    var squeal = ac.createOscillator(); squeal.type = 'sawtooth';
+    squeal.frequency.setValueAtTime(900, now + 0.01);
+    squeal.frequency.exponentialRampToValueAtTime(90, now + 0.7);
+    // LFO que da el "flap flap" característico
+    var lfo = ac.createOscillator(); lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(18, now + 0.01);
+    lfo.frequency.linearRampToValueAtTime(7, now + 0.7);
+    var lfoAmt = ac.createGain(); lfoAmt.gain.value = 80;
+    lfo.connect(lfoAmt).connect(squeal.frequency);
+    var squealLp = ac.createBiquadFilter(); squealLp.type = 'lowpass';
+    squealLp.frequency.value = 2200; squealLp.Q.value = 3;
+    var squealG = ac.createGain();
+    squealG.gain.setValueAtTime(0.0001, now + 0.008);
+    squealG.gain.exponentialRampToValueAtTime(0.3, now + 0.03);
+    squealG.gain.exponentialRampToValueAtTime(0.18, now + 0.4);
+    squealG.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+    squeal.connect(squealLp).connect(squealG).connect(master);
+    squeal.start(now + 0.008); squeal.stop(now + 0.78);
+    lfo.start(now + 0.008); lfo.stop(now + 0.78);
+
+    // 3) Soplido de aire (ruido filtrado, suma textura)
+    var airN = Math.floor(ac.sampleRate * 0.75);
+    var airBuf = ac.createBuffer(1, airN, ac.sampleRate);
+    var ad = airBuf.getChannelData(0);
+    for (var j = 0; j < airN; j++) ad[j] = (Math.random() * 2 - 1);
+    var air = ac.createBufferSource(); air.buffer = airBuf;
+    var airBp = ac.createBiquadFilter(); airBp.type = 'bandpass';
+    airBp.frequency.setValueAtTime(2500, now + 0.02);
+    airBp.frequency.exponentialRampToValueAtTime(400, now + 0.7);
+    airBp.Q.value = 2;
+    var airG = ac.createGain();
+    airG.gain.setValueAtTime(0.0001, now + 0.02);
+    airG.gain.exponentialRampToValueAtTime(0.12, now + 0.08);
+    airG.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+    air.connect(airBp).connect(airG).connect(master);
+    air.start(now + 0.02);
+  }
+
+  window.__snake = {
+    start: function () {
+      ensure(); resume();
+      if (snakeOn && !snakePaused) return;
+      if (!snakeOn) {
+        snakeRoot = 0; snakeScore = 0;
+        buildVoice();
+      }
+      snakeOn = true; snakePaused = false;
+    },
+    pause: function () {
+      snakePaused = true;
+    },
+    stop: function (died) {
+      snakeOn = false; snakePaused = false;
+      if (dubFb) dubFb.gain.setValueAtTime(0.25, ac.currentTime); // amortiguar feedback
+      if (died) balloonPop();
+      setTimeout(teardownVoice, 2000); // tiempo para que decaigan los ecos
+    },
+    bump: function (score) {
+      snakeScore = score;
+      if (snakeRoot >= 7) snakeRoot -= 5;
+      else if (snakeRoot <= -5) snakeRoot += 7;
+      else snakeRoot += (score % 2 === 0) ? 7 : -5;
+      stab(nextBeatTime());
+    }
+  };
+
+})();
+</script>
+</body>
+</html>
