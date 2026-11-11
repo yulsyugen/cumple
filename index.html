@@ -53,7 +53,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 .intro { position: relative; isolation: isolate; padding: 8px var(--gutter) 40px; }
 .intro::before, .map::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url("dots.jpg") center / cover; opacity: 0.14; }
 .kicker { font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.08em; color: var(--lime); }
-.title { margin-top: 10px; font-family: var(--f-display); font-weight: 800; font-size: clamp(27px, 7.6vw, 40px); line-height: 0.95; letter-spacing: -0.02em; text-transform: uppercase; color: var(--lime-hi); text-wrap: balance; }
+.title { margin-top: 10px; font-family: var(--f-display); font-weight: 800; font-size: clamp(18px, 6.2vw, 36px); line-height: 0.98; letter-spacing: -0.02em; text-transform: uppercase; color: var(--lime-hi); text-wrap: balance; }
 .facts { margin-top: 22px; padding-top: 18px; border-top: 2px solid rgba(241, 239, 234, 0.2); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .fact-k { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
 .fact-n { margin-top: 4px; font-family: var(--f-display); font-weight: 700; font-size: clamp(19px, 5.4vw, 24px); line-height: 1.1; }
@@ -63,7 +63,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 
 /* Mapa / recorrido */
 .map { position: relative; isolation: isolate; padding: 40px var(--gutter) 0; }
-.h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(34px, 10vw, 52px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; }
+.h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 8.2vw, 44px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; }
 .h2 span { color: var(--lime); }
 .sub { margin-top: 10px; font-size: 17px; color: #D9D3E6; }
 .route { position: relative; margin-top: 28px; }
@@ -97,6 +97,12 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 .music-ico svg { width: 12px; height: 12px; fill: currentColor; }
 .music[data-on="true"] .music-ico { animation: pulse 1.5s ease-out infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(182, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0); } }
+.music.nudge { border-color: var(--lime); animation: nudge-ring 1.8s ease-out infinite; }
+.music.nudge .music-ico { animation: nudge-beat 1.8s ease-in-out infinite; }
+.music.nudge #music-label { color: var(--lime); }
+@keyframes nudge-ring { 0% { box-shadow: 0 0 0 0 rgba(182, 255, 0, 0.6); } 70%, 100% { box-shadow: 0 0 0 16px rgba(182, 255, 0, 0); } }
+@keyframes nudge-beat { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.22); } 30% { transform: scale(1); } 45% { transform: scale(1.14); } }
+@media (prefers-reduced-motion: reduce) { .music.nudge, .music.nudge .music-ico { animation: none; } }
 .music-on .ico-play { display: none; }
 .music-off .ico-pause { display: none; }
 
@@ -104,9 +110,10 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 .stops { padding: 8px var(--gutter) 0; }
 .stops .h2 { margin-top: 8px; }
 .cards { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
-.card { display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 16px; padding: 22px 20px; border-radius: 24px; background: var(--card); border: 1px solid rgba(241, 239, 234, 0.14); }
-.num { font-family: var(--f-display); font-weight: 800; font-size: 64px; line-height: 0.85; text-align: center; color: var(--lime); }
-.time { margin-top: 8px; font-family: var(--f-mono); font-weight: 700; font-size: 15px; text-align: center; color: var(--paper); }
+.card { display: block; padding: 22px 20px; border-radius: 24px; background: var(--card); border: 1px solid rgba(241, 239, 234, 0.14); }
+.card-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(241, 239, 234, 0.14); }
+.card .num { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 44px; line-height: 0.85; color: var(--lime); }
+.card .time { margin: 0; font-family: var(--f-mono); font-weight: 700; font-size: 16px; line-height: 1; letter-spacing: 0.04em; color: var(--paper); }
 .card-k { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 .card h3 { margin-top: 6px; font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 6.4vw, 30px); line-height: 1.08; text-wrap: balance; }
 .addr { margin-top: 6px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
@@ -119,6 +126,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 .card--accent { background: var(--lime); border-color: var(--lime); }
 .card--accent .num, .card--accent .time, .card--accent h3, .card--accent p { color: var(--ink); }
 .card--accent .card-k, .card--accent .addr { color: #26240F; }
+.card--accent .card-head { border-bottom-color: rgba(12, 10, 16, 0.25); }
 .card--open { border: 2px dashed rgba(182, 255, 0, 0.5); }
 
 /* Snake */
@@ -148,7 +156,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 </head>
 <body>
 
-<button class="music music-off" id="music" type="button" data-on="false" aria-pressed="false" aria-label="Reproducir música de fondo">
+<button class="music music-off nudge" id="music" type="button" data-on="false" aria-pressed="false" aria-label="Reproducir música de fondo">
   <span class="music-ico">
     <svg class="ico-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2v8l7-4z"/></svg>
     <svg class="ico-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2h2.4v8H3zM6.6 2H9v8H6.6z"/></svg>
@@ -250,7 +258,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
   <div class="cards">
 
     <article class="card">
-      <div><p class="num">1</p><p class="time">20:00</p></div>
+      <div class="card-head"><p class="num">1</p><p class="time">20:00</p></div>
       <div>
         <p class="card-k">Encuentro</p>
         <h3>Estación Dorrego</h3>
@@ -262,7 +270,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </article>
 
     <article class="card">
-      <div><p class="num">2</p><p class="time">21:00</p></div>
+      <div class="card-head"><p class="num">2</p><p class="time">21:00</p></div>
       <div>
         <p class="card-k">Recoleta</p>
         <h3>Centro Cultural Recoleta</h3>
@@ -274,7 +282,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </article>
 
     <article class="card">
-      <div><p class="num">3</p><p class="time">22:00</p></div>
+      <div class="card-head"><p class="num">3</p><p class="time">22:00</p></div>
       <div>
         <p class="card-k">San Telmo</p>
         <h3>Pirilo Pizzería</h3>
@@ -286,7 +294,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </article>
 
     <article class="card">
-      <div><p class="num">4</p><p class="time">23:00</p></div>
+      <div class="card-head"><p class="num">4</p><p class="time">23:00</p></div>
       <div>
         <p class="card-k">San Telmo</p>
         <h3>Estudio CAT</h3>
@@ -298,7 +306,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </article>
 
     <article class="card">
-      <div><p class="num">5</p><p class="time">00:00</p></div>
+      <div class="card-head"><p class="num">5</p><p class="time">00:00</p></div>
       <div>
         <p class="card-k">Barracas</p>
         <h3>Templo Escondido</h3>
@@ -310,7 +318,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </article>
 
     <article class="card card--accent">
-      <div><p class="num">6</p><p class="time">01:00</p></div>
+      <div class="card-head"><p class="num">6</p><p class="time">01:00</p></div>
       <div>
         <p class="card-k">La Boca</p>
         <h3>Usina del Arte</h3>
@@ -322,7 +330,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </article>
 
     <article class="card card--open">
-      <div><p class="num">7</p><p class="time">02:30</p></div>
+      <div class="card-head"><p class="num">7</p><p class="time">02:30</p></div>
       <div>
         <p class="card-k">Se sigue o a mimir?</p>
         <h3>????????</h3>
@@ -564,12 +572,48 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 
   function ensure() {
     if (ac) return;
+    // iOS: sin esto el interruptor de silencio del celu mutea todo el Web Audio
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
     ac = new AC();
     master = ac.createGain(); master.gain.value = 0.8; master.connect(ac.destination);
     musicBus = ac.createGain(); musicBus.gain.value = 0.55; musicBus.connect(master);
     acidBus = ac.createGain(); acidBus.gain.value = 0.7; acidBus.connect(master);
   }
-  function resume() { if (ac && ac.state === 'suspended') ac.resume(); }
+  // Audio HTML silencioso en loop: en iOS fuerza la sesión de "reproducción" y el Web Audio suena aunque el celu esté en silencio
+  var mediaEl = null;
+  function unlockMedia() {
+    try {
+      if (!mediaEl) {
+        var n = 800, buf = new Uint8Array(44 + n), dv = new DataView(buf.buffer);
+        var tag = function (o, t) { for (var i = 0; i < t.length; i++) buf[o + i] = t.charCodeAt(i); };
+        tag(0, 'RIFF'); dv.setUint32(4, 36 + n, true); tag(8, 'WAVE'); tag(12, 'fmt ');
+        dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+        dv.setUint32(24, 8000, true); dv.setUint32(28, 8000, true); dv.setUint16(32, 1, true); dv.setUint16(34, 8, true);
+        tag(36, 'data'); dv.setUint32(40, n, true);
+        for (var i = 0; i < n; i++) buf[44 + i] = 128;
+        mediaEl = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+        mediaEl.loop = true;
+        mediaEl.setAttribute('playsinline', '');
+      }
+      var pr = mediaEl.play();
+      if (pr && pr.catch) pr.catch(function () {});
+    } catch (e) {}
+  }
+  function releaseMedia() { try { if (mediaEl) mediaEl.pause(); } catch (e) {} }
+  function resume() {
+    unlockMedia();
+    if (ac && ac.state !== 'running') {
+      var p = ac.resume();
+      if (p && p.catch) p.catch(function () {});
+    }
+  }
+  // si el sistema corta el audio (llamada, bloqueo de pantalla), el próximo toque lo reactiva
+  ['pointerdown', 'touchend', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, function () {
+      if ((playing || snakeOn) && ac && ac.state !== 'running') resume();
+    }, { passive: true });
+  });
+
 
   function noiseBuf(dur) {
     var n = Math.floor(ac.sampleRate * dur);
@@ -677,7 +721,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     stepIdx = 0; nextTime = ac.currentTime + 0.06;
     window.__musicAnchor = nextTime; // para que el snake pueda cuantizar al beat
     timer = setInterval(tick, 25);
-    btn.classList.remove('music-off'); btn.classList.add('music-on');
+    btn.classList.remove('music-off', 'nudge'); btn.classList.add('music-on');
     btn.setAttribute('data-on', 'true'); btn.setAttribute('aria-pressed', 'true');
     btn.setAttribute('aria-label', 'Pausar música de fondo');
     label.textContent = 'Pausa';
@@ -690,6 +734,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     btn.setAttribute('data-on', 'false'); btn.setAttribute('aria-pressed', 'false');
     btn.setAttribute('aria-label', 'Reproducir música de fondo');
     label.textContent = 'Play';
+    if (!snakeOn) releaseMedia();
   }
   btn.addEventListener('click', function () { playing ? pause() : play(); });
   document.addEventListener('visibilitychange', function () { if (document.hidden && playing) pause(); });
@@ -818,7 +863,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
       snakeOn = false; snakePaused = false;
       if (dubFb) dubFb.gain.setValueAtTime(0.25, ac.currentTime); // amortiguar feedback
       if (died) balloonPop();
-      setTimeout(teardownVoice, 2000); // tiempo para que decaigan los ecos
+      setTimeout(function () { teardownVoice(); if (!playing && !snakeOn) releaseMedia(); }, 2000); // tiempo para que decaigan los ecos
     },
     bump: function (score) {
       snakeScore = score;
