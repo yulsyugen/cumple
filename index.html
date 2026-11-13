@@ -121,12 +121,10 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
 .card .btn { margin-top: 16px; }
 .next { margin-top: 16px; padding: 12px 14px; border-radius: 12px; border: 1px dashed rgba(182, 255, 0, 0.35); font-family: var(--f-mono); font-size: 13px; line-height: 1.4; color: var(--soft); letter-spacing: 0.02em; }
 .next b { color: var(--lime); font-weight: 700; }
-.card--accent .next { border-color: rgba(12, 10, 16, 0.5); color: #26240F; }
-.card--accent .next b { color: var(--ink); }
-.card--accent { background: var(--lime); border-color: var(--lime); }
-.card--accent .num, .card--accent .time, .card--accent h3, .card--accent p { color: var(--ink); }
-.card--accent .card-k, .card--accent .addr { color: #26240F; }
-.card--accent .card-head { border-bottom-color: rgba(12, 10, 16, 0.25); }
+.next-alt { display: block; margin-top: 10px; }
+.lineup { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-family: var(--f-mono); font-size: 13px; line-height: 1.35; color: var(--soft); }
+.lineup li { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 10px; }
+.lineup b { color: var(--lime); font-weight: 700; }
 .card--open { border: 2px dashed rgba(182, 255, 0, 0.5); }
 
 /* Snake */
@@ -212,7 +210,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </li>
     <li class="stop stop--r" style="--x:84%">
       <span class="node">2</span>
-      <div class="label"><span class="l-time">20:45</span><span class="l-name">CC Recoleta</span><span class="l-sub">Recoleta</span></div>
+      <div class="label"><span class="l-time">21:00</span><span class="l-name">Palacio Libertad</span><span class="l-sub">Festival Helix · ex CCK</span></div>
     </li>
     <li class="stop stop--l" style="--x:20%">
       <span class="node">3</span>
@@ -232,13 +230,13 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
     </li>
     <li class="stop stop--l stop--open" style="--x:22%">
       <span class="node node--open">7</span>
-      <div class="label"><span class="l-time">02:30</span><span class="l-name">?????</span><span class="l-sub">To be continued?</span></div>
+      <div class="label"><span class="l-time">02:00</span><span class="l-name">?????</span><span class="l-sub">To be continued?</span></div>
     </li>
   </ol>
   </div>
 
   <div class="map-actions">
-    <a class="btn btn--paper" href="https://www.google.com/maps/dir/?api=1&amp;origin=Estaci%C3%B3n+Dorrego+Subte+B+Buenos+Aires&amp;destination=Usina+del+Arte+Caffarena+1+Buenos+Aires&amp;waypoints=Centro+Cultural+Recoleta+Jun%C3%ADn+1930+Buenos+Aires%7CPirilo+Pizzer%C3%ADa+Defensa+821+Buenos+Aires%7CEstudio+CAT+Chacabuco+974+San+Telmo+Buenos+Aires%7CMuseo+Santa+Felicitas+Pinz%C3%B3n+1480+Buenos+Aires" target="_blank" rel="noopener">Ver el recorrido completo en Google Maps ↗</a>
+    <a class="btn btn--paper" href="https://www.google.com/maps/dir/?api=1&amp;origin=Estaci%C3%B3n+Dorrego+Subte+B+Buenos+Aires&amp;destination=Usina+del+Arte+Caffarena+1+Buenos+Aires&amp;waypoints=Palacio+Libertad+Sarmiento+151+Buenos+Aires%7CPirilo+Pizzer%C3%ADa+Defensa+821+Buenos+Aires%7CEstudio+CAT+Chacabuco+974+San+Telmo+Buenos+Aires%7CMuseo+Santa+Felicitas+Pinz%C3%B3n+1480+Buenos+Aires" target="_blank" rel="noopener">Ver el recorrido completo en Google Maps ↗</a>
     <div class="transport">
       <h3>🚌 TRANSPORTE GRATUITO</h3>
       <dl>
@@ -265,19 +263,22 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
         <p class="addr">Subte B</p>
         <p>Nos juntamos acá y a las 20.20 como mucho arrancamos. Podes traer buena compañía :)</p>
         <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Estaci%C3%B3n+Dorrego+Subte+B+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
-        <p class="next"><b>→ Hacia CC Recoleta:</b> Subte B hasta Corrientes + combinación con H hasta Las Heras + 10 min a pie por Av. Pueyrredón.</p>
+        <p class="next"><b>→ Hacia Palacio Libertad:</b> Subte B directo hasta L. N. Alem (cabecera), la estación queda pegada al Palacio.</p>
       </div>
     </article>
 
     <article class="card">
       <div class="card-head"><p class="num">2</p><p class="time">21:00</p></div>
       <div>
-        <p class="card-k">Recoleta</p>
-        <h3>Centro Cultural Recoleta</h3>
-        <p class="addr">Junín 1930</p>
-        <p>DJ Set de HTML (Marina Saporiti) en el Patio del Aljibe, de 20 a 22 h: un recorrido sonoro entre lo analógico y lo digital, minimalista y experimental.<br>A las 21:30 arranca Meridiana en la terraza, hace rock alternativo con guitarras procesadas.</p>
-        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Centro+Cultural+Recoleta+Jun%C3%ADn+1930+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
-        <p class="next"><b>→ Hacia Pirilo:</b> Subte D desde Facultad de Medicina hasta Catedral + 10 min a pie por Defensa.</p>
+        <p class="card-k">Festival Helix</p>
+        <h3>Palacio Libertad (ex CCK)</h3>
+        <p class="addr">Sarmiento 151</p>
+        <p>Helix mezcla arte, ciencia y tecnología: esa noche hay live sets audiovisuales y performances en Plaza Seca y en la Ballena. El Palacio está abierto de 16 a 00 h, con sus muestras e instalaciones (Disney, Sala Inmersiva Molina Campos).</p>
+        <ul class="lineup">
+          <li><b>21:30</b><span>Symbiogenesis (Hyphae) · live set AV</span></li>
+        </ul>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Palacio+Libertad+Sarmiento+151+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <p class="next"><b>→ Hacia Pirilo:</b> Subte E desde Correo Central hasta Independencia (3 paradas) + unos 10 min a pie por Av. Independencia hasta Defensa.</p>
       </div>
     </article>
 
@@ -301,7 +302,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
         <p class="addr">Ciencia, Arte y Tecnología · Chacabuco 974</p>
         <p>Lilí Gardés Project: set performático con visuales y canciones electrónicas, entre lo ancestral y lo futuro. Además, instalaciones inmersivas de Mariano Airaldi, luminarias de diseño y música experimental en vivo.</p>
         <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Estudio+CAT+Chacabuco+974+San+Telmo+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
-        <p class="next"><b>→ Hacia Templo Escondido:</b> colectivo 29 hacia Barracas por Montes de Oca (~10 min).</p>
+        <p class="next"><b>→ Hacia Templo Escondido:</b> colectivo 29 hacia Barracas por Montes de Oca (~10 min). Si se hace tarde, salteamos la próxima parada y vamos directo a la Usina.<span class="next-alt"><b>→ Directo a la Usina:</b> EBUS gratis (pasa por Perú, a una cuadra) o colectivo 29 hasta Av. Alte. Brown.</span></p>
       </div>
     </article>
 
@@ -317,20 +318,20 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--lime); outline-
       </div>
     </article>
 
-    <article class="card card--accent">
+    <article class="card">
       <div class="card-head"><p class="num">6</p><p class="time">01:00</p></div>
       <div>
         <p class="card-k">La Boca</p>
         <h3>Usina del Arte</h3>
         <p class="addr">Caffarena 1</p>
         <p>Cuerpo/Señal: proyecciones láser, sonido y luz sobre la fachada, reactivo a las siluetas en tiempo real.<br>DJ sets en la plaza hasta las 2 h (Balaciano, Chinwezz, Carlos Alfonsin, Chiri, Gonz Lijtenberg).</p>
-        <a class="btn btn--ink" href="https://www.google.com/maps/search/?api=1&amp;query=Usina+del+Arte+Caffarena+1+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
+        <a class="btn btn--lime" href="https://www.google.com/maps/search/?api=1&amp;query=Usina+del+Arte+Caffarena+1+Buenos+Aires" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
         <p class="next"><b>→ Para salir de la Usina:</b> EBUS gratis hasta las 03 h.</p>
       </div>
     </article>
 
     <article class="card card--open">
-      <div class="card-head"><p class="num">7</p><p class="time">02:30</p></div>
+      <div class="card-head"><p class="num">7</p><p class="time">02:00</p></div>
       <div>
         <p class="card-k">Se sigue o a mimir?</p>
         <h3>????????</h3>
